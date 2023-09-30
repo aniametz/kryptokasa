@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CryptoForm from "./CryptoOptionsForm";
 
 export default function CalculationsForm() {
@@ -35,7 +36,6 @@ export default function CalculationsForm() {
       ...formValues,
       [name]: value,
     });
-
   };
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,7 +70,15 @@ export default function CalculationsForm() {
     handleCalculateCryptoAverage()
   };
 
-  const handleCalculateCryptoAverage = () => { }
+  const navigate = useNavigate();
+
+  const handleCalculateCryptoAverage = () => {
+    navigate('/results')
+  }
+
+  const handleGoToManualSourcesForm = () => {
+    navigate('/manualsourcesform')
+  }
 
   return (
     <>
@@ -103,6 +111,10 @@ export default function CalculationsForm() {
       </form>
       <button onClick={handleValidateInput}>OBLICZ</button>
       {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+
+      <br></br>
+      <br></br>
+      <button onClick={handleGoToManualSourcesForm}>MANUALNIE WPROWADŹ DANE DO WYCENY</button>
     </>
   );
 }

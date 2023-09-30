@@ -1,9 +1,17 @@
-import CalculationsForm from '../forms/CalculationsForm'
+import { Routes, Route } from 'react-router-dom';
+
+import CalculationsForm from '../forms/CalculationsForm';
+import CalculationsResults from './CalculationsResults';
+import ManualSourcesForm from '../forms/ManualSourcesForm';
 
 export default function Home() {
   return (
     <>
-      <CalculationsForm />
+      <Routes>
+        <Route path="/" element={<CalculationsForm />} />
+        <Route path="/results" element={<CalculationsResults />} />
+        <Route path="/manualsourcesform" element={<ManualSourcesForm />} />
+      </Routes>
     </>
   );
 }

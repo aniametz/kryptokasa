@@ -1,6 +1,6 @@
 import './App.css';
 
-import Home from './forms/CalculationsForm'
+import Home from './general/Home'
 
 export default function App() {
   return (
