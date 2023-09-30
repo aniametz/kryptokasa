@@ -67,6 +67,17 @@ export default function CalculationsForm() {
     setErrorMessage("")
 
     console.log({ ...formValues, crypto: { ...cryptoForms } })
+    fetch('http://localhost:5000/get_price', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cryptoForms)
+    })
+        .then(response => response.json())
+        .then(data => {
+                document.getElementById('price').textContent = 'Price: $' + data.price;
+            });
     handleCalculateCryptoAverage()
   };
 

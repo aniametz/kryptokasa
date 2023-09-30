@@ -22,9 +22,14 @@ NBP_URL = f"https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json"
 # automatic fetch from 3 sources
 @app.route('/get_price', methods=['POST'])
 def get_price():
-    symbol = request.json.get('symbol')
-    url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
-    prices = [fetch_crypto_price(symbol=symbol, source_url=url) for url in url_sources]
+    all_data = request.json
+    unique_symbols = list({item['selectedOption'] for item in all_data})
+
+    # url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
+    url_sources = [f"https://api.zondacrypto.exchange/rest/trading/ticker/", "", ""]
+    prices = [fetch_crypto_price(symbol=symbol, source_url=url) for url in url_sources for symbol in unique_symbols]
+
+    # calculate average
 
     # PDF report part
     pdf_buffer = create_pdf(12, "4324342", 20)
@@ -36,18 +41,24 @@ def get_price():
 
 def fetch_crypto_price(symbol, source_url, currency="PLN"):
     url = f"{source_url}{symbol}-{currency}"
-    data = fetch_url(url)
+    try:
+        data = fetch_url(url)
+    except Exception as e:
+        print("data could not be fetched")
+        return {'price': "", 'date': "", 'url': url, 'stock': "", 'symbol': symbol, 'currency': currency}
+
+
     if data["status"] == "Fail" and "TICKER_NOT_FOUND" in data["errors"]:
         currency = "USD"
         url = f"{source_url}{symbol}-{currency}"
         data = fetch_url(url)
-    if currency == "PLN":
+    if currency == "USD":
         usd_to_pln_price = fetch_usd_to_pln_price()
     timestamp = int(data["ticker"]["time"])
     date = datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
     price = data["ticker"]["rate"]
     stock = stocks_enum[source_url]
-    return {'price': price, 'date': date, 'url': url, 'stock': stock, 'currency': currency}
+    return {'price': price, 'date': date, 'url': url, 'stock': stock, 'symbol': symbol, 'currency': currency}
 
 
 def fetch_url(url):
