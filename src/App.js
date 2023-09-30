@@ -1,10 +1,10 @@
 import './App.css';
 
-import Home from './pages/Home'
+import Home from './general/Home'
 
 export default function App() {
   return (
-    <Home></Home>
+    <Home />
   );
 }
 
