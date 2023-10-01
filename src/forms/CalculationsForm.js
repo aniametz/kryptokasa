@@ -76,9 +76,26 @@ export default function CalculationsForm() {
     })
         .then(response => response.json())
         .then(data => {
-                document.getElementById('price').textContent = 'Price: $' + data.price;
+          console.log(data)
+          const result = data.reduce((acc, item) => {
+            if (!acc[item.symbol]) {
+                acc[item.symbol] = 0;
+            }
+            if (item.price === "") {
+                acc[item.symbol]++;
+            }
+            return acc;
+        }, {});
+          console.log(result)
+                // document.getElementById('price').textContent = 'Price: $' + data.price;
+          if (Object.values(result).every(value => value === 0)){
+            handleCalculateCryptoAverage()
+          }
+          else {
+            console.log("todo");
+          }
+
             });
-    handleCalculateCryptoAverage()
   };
 
   const navigate = useNavigate();

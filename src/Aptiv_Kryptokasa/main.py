@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, abort
 from flask_cors import CORS
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -25,8 +25,8 @@ def get_price():
     all_data = request.json
     unique_symbols = list({item['selectedOption'] for item in all_data})
 
-    # url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
-    url_sources = [f"https://api.zondacrypto.exchange/rest/trading/ticker/", "", ""]
+    url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
+    # url_sources = [f"https://api.zondacrypto.exchange/rest/trading/ticker/", "", ""]
     prices = [fetch_crypto_price(symbol=symbol, source_url=url) for url in url_sources for symbol in unique_symbols]
 
     # calculate average
@@ -36,7 +36,7 @@ def get_price():
     response = Response(pdf_buffer.read(), content_type='application/pdf')
     response.headers['Content-Disposition'] = 'inline; filename=sample.pdf'
 
-    return jsonify({'price': prices})
+    return jsonify(prices)
 
 
 def fetch_crypto_price(symbol, source_url, currency="PLN"):
@@ -117,6 +117,28 @@ def create_pdf(raportId, numerSprawy, sredniaWartosc):
 
     return buffer
 
+# manual mode
+def validate_required_fields(json_data):
+    required_elements = 3
+    if len(json_data) == required_elements:
+        for el in json_data:
+            if not("adres" in el and "nazwa" in el and "kurs" in el and "symbol" in el):
+                return False
+    else:
+        return False
+
+    return True
+
+@app.route('/get_manual_price', methods=['POST'])
+def get_manual_price():
+    received_json = request.get_json()
+
+    if not validate_required_fields(received_json):
+        abort(404, description="Invalid given json")
+
+    # to do handling exchange rates
+
+    return "Success"
 
 if __name__ == '__main__':
     app.run(debug=False)
