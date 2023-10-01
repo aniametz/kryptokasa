@@ -10,7 +10,7 @@ export default function CalculationsResult({ data }) {
         <div className="form-input">{data.symbol}</div>
       </div>
       <div class="form-pair">
-        <div class="form-label">Nazwa: </div>
+        <div class="form-label">Nazwa giełdy: </div>
         <div class="form-input">{data.stock}</div>
       </div>
       <div class="form-pair">
