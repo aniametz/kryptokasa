@@ -44,7 +44,8 @@ def generate_report():
 
         aggregated_data[symbol]["sum"] += price
         aggregated_data[symbol]["count"] += 1
-        aggregated_data[symbol]["quantity"] += quantity
+        if aggregated_data[symbol]["quantity"] == 0:
+            aggregated_data[symbol]["quantity"] = quantity
         aggregated_data[symbol]["average"] = aggregated_data[symbol]["sum"] / aggregated_data[symbol]["count"]
 
     averages = {symbol: values["sum"] / values["count"] for symbol, values in aggregated_data.items()}

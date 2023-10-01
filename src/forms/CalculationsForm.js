@@ -40,7 +40,7 @@ export default function CalculationsForm() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const allowedCharactersMessage = "Dopuszczalne są duże i małe litery, cyfry oraz znaki takie jak „.”, „-”, „/”."
-  const allowedCharacters = /^[a-zA-Z0-9.-/]*$/;
+  const allowedCharacters = /^[a-zA-Z0-9. -/]*$/;
 
   const handleValidateInput = () => {
     if (Object.values(formValues).some((value) => value.trim() === '')
