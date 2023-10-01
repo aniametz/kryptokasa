@@ -1,20 +1,20 @@
 export default function CryptoForm({ options, selectedOption, onOptionChange, numericValue, onNumericValueChange, onRemove }) {
   return (
     <>
-      <div class="space-y-4">
-        <div class="form-pair">
-          <label class="form-label">Nazwa</label>
-          <select class="form-input" value={selectedOption} onChange={onOptionChange}>
+      <div className="space-y-4">
+        <div className="form-pair">
+          <label className="form-label">Nazwa</label>
+          <select className="form-input" value={selectedOption} onChange={onOptionChange}>
             {options.map((option, index) => (
               <option key={index} value={option}>{option}</option>
             ))}
           </select>
         </div>
-        <div class="form-pair">
-          <label class="form-label">Ilość</label>
-          <input class="form-input" type="number" value={numericValue} onChange={onNumericValueChange} />
+        <div className="form-pair">
+          <label className="form-label">Ilość</label>
+          <input className="form-input" type="number" value={numericValue} onChange={onNumericValueChange} />
         </div>
-        <button class="btn-red" onClick={onRemove}>-</button>
+        <button className="btn-red" onClick={onRemove}>-</button>
       </div>
       <br></br>
     </>

@@ -71,32 +71,36 @@ export default function CalculationsForm() {
     fetch('http://localhost:5000/get_price', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(cryptoForms)
     })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          const result = data.reduce((acc, item) => {
-            if (!acc[item.symbol]) {
-                acc[item.symbol] = 0;
-            }
-            if (item.price === "") {
-                acc[item.symbol]++;
-            }
-            return acc;
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        const missingPrices = data.reduce((acc, item) => {
+          if (!acc[item.symbol]) {
+            acc[item.symbol] = 0;
+          }
+          if (item.price === "") {
+            acc[item.symbol]++;
+          }
+          return acc;
         }, {});
-          console.log(result)
-                // document.getElementById('price').textContent = 'Price: $' + data.price;
-          if (Object.values(result).every(value => value === 0)){
-            handleCalculateCryptoAverage(data)
-          }
-          else {
-            console.log("todo");
-          }
+        console.log(missingPrices)
+        console.log('todo - do kasacji')
+        const mockMissingPrices = { 'BTC': 1, 'ETH': 2 }
+        if (Object.values(mockMissingPrices).every(value => value === 0)) {
+          handleCalculateCryptoAverage(data)
+        }
+        else {
+          setIsAutomatic(false);
+          console.log({ data })
+          handleGoToManualSourcesForm(mockMissingPrices, data)
+          return;
+        }
 
-            });
+      });
   };
 
   const navigate = useNavigate();
@@ -105,8 +109,8 @@ export default function CalculationsForm() {
     navigate('/results', { state: { data: data } })
   }
 
-  const handleGoToManualSourcesForm = () => {
-    navigate('/manualsourcesform')
+  const handleGoToManualSourcesForm = (missingPrices, data) => {
+    navigate('/manualsourcesform', { state: { missingPrices: missingPrices, data: data } })
   }
 
   const placeholderWithAllowedCharacters = 'Dozwolone: a-z A-Z 0-9 . - / '
@@ -114,26 +118,26 @@ export default function CalculationsForm() {
 
   return (
     <>
-      <div class="bg-slate-900">
+      <div className="bg-slate-900">
         <div className="form-container">
           <p className="form-header">Wycena kryptoaktyw</p>
           <p className="mode-text">{modeInfo}</p>
           <form>
-            <div class="space-y-4">
-              <div class="form-pair">
-                <label class="form-label">Nazwa organu egzekucyjnego</label>
-                <input class="form-input" type='text' name="entityName" value={formValues.entityName} onChange={handleInputChange} />
+            <div className="space-y-4">
+              <div className="form-pair">
+                <label className="form-label">Nazwa organu egzekucyjnego</label>
+                <input className="form-input" type='text' name="entityName" value={formValues.entityName} onChange={handleInputChange} />
               </div>
-              <div class="form-pair">
-                <label class="form-label">Numer sprawy</label>
-                <input class="form-input" type='text' maxLength={100} name="caseId" value={formValues.caseId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
+              <div className="form-pair">
+                <label className="form-label">Numer sprawy</label>
+                <input className="form-input" type='text' maxLength={100} name="caseId" value={formValues.caseId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
               </div>
-              <div class="form-pair">
-                <label class="form-label">Dane identyfikacyjne</label>
-                <input class="form-input" type='text' maxLength={100} name="personId" value={formValues.personId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
+              <div className="form-pair">
+                <label className="form-label">Dane identyfikacyjne</label>
+                <input className="form-input" type='text' maxLength={100} name="personId" value={formValues.personId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
               </div>
             </div>
-            <hr class="horizontal" />
+            <hr className="horizontal" />
             <p className="form-small-header">Kryptoaktywa</p>
             <div>
               {cryptoForms.map((data, index) => (
@@ -149,15 +153,15 @@ export default function CalculationsForm() {
             </div>
             <br></br>
             <br></br>
-            <button class="btn-green" onClick={handleAddCryptoForm}>+</button>
+            <button className="btn-green" onClick={handleAddCryptoForm}>+</button>
           </form>
-          <hr class="horizontal" />
-          <button class="btn-blue" onClick={handleValidateInput}>OBLICZ</button>
-          {errorMessage && <div class="error-text">{errorMessage}</div>}
+          <hr className="horizontal" />
+          <button className="btn-blue" onClick={handleValidateInput}>OBLICZ</button>
+          {errorMessage && <div className="error-text">{errorMessage}</div>}
 
           <br></br>
           <br></br>
-          <button class="btn-blue" onClick={handleGoToManualSourcesForm}>WPROWADŹ DANE DO WYCENY</button>
+          {/* {!isAutomatic && <button className="btn-blue" onClick={handleGoToManualSourcesForm}>WPROWADŹ DANE DO WYCENY</button>} */}
         </div>
       </div>
     </>
