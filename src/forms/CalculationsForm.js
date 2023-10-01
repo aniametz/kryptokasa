@@ -6,6 +6,7 @@ export default function CalculationsForm() {
   const [formValues, setFormValues] = useState({ entityName: '', caseId: '', personId: '' });
   const mockCryptoSymbols = ["BTC", "ETH", "CITY"]
   const [cryptoForms, setCryptoForms] = useState([{ selectedOption: mockCryptoSymbols[0], numericValue: '' }]);
+  const [isAutomatic, setIsAutomatic] = useState(true)
 
   const handleAddCryptoForm = (event) => {
     event.preventDefault();
@@ -109,12 +110,14 @@ export default function CalculationsForm() {
   }
 
   const placeholderWithAllowedCharacters = 'Dozwolone: a-z A-Z 0-9 . - / '
+  const modeInfo = isAutomatic ? "Tryb:  Automatyczny" : "Tryb: Manualny"
 
   return (
     <>
       <div class="bg-slate-900">
         <div className="form-container">
           <p className="form-header">Wycena kryptoaktyw</p>
+          <p className="mode-text">{modeInfo}</p>
           <form>
             <div class="space-y-4">
               <div class="form-pair">

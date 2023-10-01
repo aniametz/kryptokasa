@@ -51,4 +51,8 @@
     @apply text-blue-900 font-bold p-2 mb-2
   }
 
+  .mode-text {
+    @apply text-slate-50 text-center font-bold p-2 mb-2
+  }
+
 }
