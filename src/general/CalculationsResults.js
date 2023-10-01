@@ -20,13 +20,20 @@ export default function CalculationsResults() {
 
     return (
         <>
-            <div>
-                {mockResults.map((dataEntry, index) => (
-                    <CalculationsResult key={index} data={dataEntry} />
-                ))}
-            </div>
-            <button onClick={handleGenerateReport}>GENERUJ RAPORT</button>
-            <button onClick={handleComeBack}>WRÓĆ</button>
+            <div class="bg-slate-900">
+                <div className="form-container">
+                    <p className="form-header">Średnia wartość kryptoaktyw</p>
+                    <div class="space-y-4">
+                        {mockResults.map((dataEntry, index) => (
+                            <CalculationsResult key={index} data={dataEntry} />
+                        ))}
+                    </div>
+                    <div class="space-y-4">
+                        <button class="btn-red w-full" onClick={handleComeBack}>WRÓĆ</button>
+                        <button class="btn-blue" onClick={handleGenerateReport}>GENERUJ RAPORT</button>
+                    </div>
+                </div>
+            </div >
         </>
     );
 }

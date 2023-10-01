@@ -80,41 +80,55 @@ export default function CalculationsForm() {
     navigate('/manualsourcesform')
   }
 
+  const placeholderWithAllowedCharacters = 'Dozwolone: a-z A-Z 0-9 . - / '
+
   return (
     <>
-      <h1>Wycena Kryptoaktyw</h1>
-      <form>
-        <div>
-          <label>Nazwa organu egzekucyjnego</label><input type='text' name="entityName" value={formValues.entityName} onChange={handleInputChange} />
-          <br></br>
-          <label>Numer sprawy</label><input type='text' maxLength={100} name="caseId" value={formValues.caseId} onChange={handleInputChange} placeholder='Dozwolone: a-z A-Z 0-9 . - / ' />
-          <br></br>
-          <label>Dane identyfikacyjne</label><input type='text' maxLength={100} name="personId" value={formValues.personId} onChange={handleInputChange} placeholder='Dozwolone: a-z A-Z 0-9 . - / ' />
-          <br></br>
-        </div>
-        <h5>Kryptoaktywa</h5>
-        <div>
-          {cryptoForms.map((data, index) => (
-            <CryptoForm
-              key={index}
-              options={mockCryptoSymbols}
-              selectedOption={data.selectedOption}
-              onOptionChange={(e) => handleOptionChange(index, e)}
-              onNumericValueChange={(e) => handleNumericValueChange(index, e)}
-              onRemove={(e) => handleRemoveCryptoForm(index, e)}
-            />
-          ))}
-        </div>
-        <br></br>
-        <br></br>
-        <button onClick={handleAddCryptoForm}>+</button>
-      </form>
-      <button onClick={handleValidateInput}>OBLICZ</button>
-      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+      <div class="bg-slate-900">
+        <div className="form-container">
+          <p className="form-header">Wycena kryptoaktyw</p>
+          <form>
+            <div class="space-y-4">
+              <div class="form-pair">
+                <label class="form-label">Nazwa organu egzekucyjnego</label>
+                <input class="form-input" type='text' name="entityName" value={formValues.entityName} onChange={handleInputChange} />
+              </div>
+              <div class="form-pair">
+                <label class="form-label">Numer sprawy</label>
+                <input class="form-input" type='text' maxLength={100} name="caseId" value={formValues.caseId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
+              </div>
+              <div class="form-pair">
+                <label class="form-label">Dane identyfikacyjne</label>
+                <input class="form-input" type='text' maxLength={100} name="personId" value={formValues.personId} onChange={handleInputChange} placeholder={placeholderWithAllowedCharacters} />
+              </div>
+            </div>
+            <hr class="horizontal" />
+            <p className="form-small-header">Kryptoaktywa</p>
+            <div>
+              {cryptoForms.map((data, index) => (
+                <CryptoForm
+                  key={index}
+                  options={mockCryptoSymbols}
+                  selectedOption={data.selectedOption}
+                  onOptionChange={(e) => handleOptionChange(index, e)}
+                  onNumericValueChange={(e) => handleNumericValueChange(index, e)}
+                  onRemove={(e) => handleRemoveCryptoForm(index, e)}
+                />
+              ))}
+            </div>
+            <br></br>
+            <br></br>
+            <button class="btn-green" onClick={handleAddCryptoForm}>+</button>
+          </form>
+          <hr class="horizontal" />
+          <button class="btn-blue" onClick={handleValidateInput}>OBLICZ</button>
+          {errorMessage && <div class="error-text">{errorMessage}</div>}
 
-      <br></br>
-      <br></br>
-      <button onClick={handleGoToManualSourcesForm}>MANUALNIE WPROWADŹ DANE DO WYCENY</button>
+          <br></br>
+          <br></br>
+          <button class="btn-blue" onClick={handleGoToManualSourcesForm}>WPROWADŹ DANE DO WYCENY</button>
+        </div>
+      </div>
     </>
   );
 }
