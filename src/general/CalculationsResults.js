@@ -15,6 +15,17 @@ export default function CalculationsResults() {
 
     const handleGenerateReport = (event) => {
         console.log("Raport do wygenerowania")
+
+        fetch('http://localhost:5000/generate_report', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)});
     };
 
     const navigate = useNavigate();
