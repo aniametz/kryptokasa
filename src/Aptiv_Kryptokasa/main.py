@@ -8,6 +8,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime, date
+import os
 import time
 import requests
 from io import BytesIO
@@ -54,7 +55,7 @@ def generate_report():
     # PDF report part
     report_id = int(time.time())
     case_id= str(time.time())
-    create_pdf(report_id, case_id, aggregated_data, r"C:\repos\kryptokasa\report.pdf")
+    create_pdf(report_id, case_id, aggregated_data)
     return jsonify(aggregated_data)
 
 
@@ -91,7 +92,8 @@ def fetch_usd_to_pln_price():
     return usd_to_pln_price
 
 
-def create_pdf(report_id, case_id, aggregated_data, path_to_save):
+def create_pdf(report_id, case_id, aggregated_data):
+    path_to_save = os.path.join(get_downloads_folder(), f'report_{report_id}.pdf')
     c = canvas.Canvas(path_to_save, pagesize=A4)
 
     # Handling polish letters
@@ -145,7 +147,7 @@ def generate_crypto_page(c, crypto, data, font_name, text_size):
     quantity_text = f"Ilość: {data['quantity']}"
     average_text = f"Średnia cena: {data['average']}"
     count_text = f"Średnia liczona z {data['count']} źródeł"
-    sum_text = f"Wartość aktywów w oparciu o średnią cenę: {data['quantity']*data['average']} PLN"
+    sum_text = f"Wartość aktywów w oparciu o średnią cenę: {round(data['quantity']*data['average'], 2)} PLN"
 
     c.drawString(80, 720, quantity_text)
     c.drawString(80, 700, average_text)
@@ -176,6 +178,10 @@ def get_manual_price():
     # to do handling exchange rates
 
     return "Success"
+
+def get_downloads_folder():
+    home = os.path.expanduser("~")
+    return os.path.join(home, 'Downloads')
 
 if __name__ == '__main__':
     app.run(debug=False)
