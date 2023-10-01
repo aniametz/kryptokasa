@@ -67,7 +67,35 @@ export default function CalculationsForm() {
     setErrorMessage("")
 
     console.log({ ...formValues, crypto: { ...cryptoForms } })
-    handleCalculateCryptoAverage()
+    fetch('http://localhost:5000/get_price', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cryptoForms)
+    })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          const result = data.reduce((acc, item) => {
+            if (!acc[item.symbol]) {
+                acc[item.symbol] = 0;
+            }
+            if (item.price === "") {
+                acc[item.symbol]++;
+            }
+            return acc;
+        }, {});
+          console.log(result)
+                // document.getElementById('price').textContent = 'Price: $' + data.price;
+          if (Object.values(result).every(value => value === 0)){
+            handleCalculateCryptoAverage()
+          }
+          else {
+            console.log("todo");
+          }
+
+            });
   };
 
   const navigate = useNavigate();
