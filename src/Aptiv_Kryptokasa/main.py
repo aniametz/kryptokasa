@@ -31,13 +31,30 @@ def get_price():
 
     # calculate average
 
+
+
+    return jsonify(prices)
+
+@app.route('/generate_report', methods=['POST'])
+def generate_report():
+    all_data = request.json
+    aggregated_data = {}
+
+    for entry in all_data:
+        symbol = entry["symbol"]
+        price = float(entry["price"])  # Convert price to float for calculation
+
+        if symbol not in aggregated_data:
+            aggregated_data[symbol] = {"sum": 0, "count": 0}
+
+        aggregated_data[symbol]["sum"] += price
+        aggregated_data[symbol]["count"] += 1
+
+    averages = {symbol: values["sum"] / values["count"] for symbol, values in aggregated_data.items()}
     # PDF report part
     pdf_buffer = create_pdf(12, "4324342", 20)
     response = Response(pdf_buffer.read(), content_type='application/pdf')
     response.headers['Content-Disposition'] = 'inline; filename=sample.pdf'
-
-    return jsonify(prices)
-
 
 def fetch_crypto_price(symbol, source_url, currency="PLN"):
     url = f"{source_url}{symbol}-{currency}"
