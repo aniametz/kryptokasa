@@ -89,7 +89,7 @@ export default function CalculationsForm() {
           console.log(result)
                 // document.getElementById('price').textContent = 'Price: $' + data.price;
           if (Object.values(result).every(value => value === 0)){
-            handleCalculateCryptoAverage()
+            handleCalculateCryptoAverage(data)
           }
           else {
             console.log("todo");
@@ -100,8 +100,8 @@ export default function CalculationsForm() {
 
   const navigate = useNavigate();
 
-  const handleCalculateCryptoAverage = () => {
-    navigate('/results')
+  const handleCalculateCryptoAverage = (data) => {
+    navigate('/results', { state: { data: data } })
   }
 
   const handleGoToManualSourcesForm = () => {

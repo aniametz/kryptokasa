@@ -1,7 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import CalculationsResult from './CalculationsResult'
+import { useLocation } from 'react-router-dom';
+
 
 export default function CalculationsResults() {
+    const location = useLocation();
+    const data = location.state ? location.state.data : null;
+    console.log(data)
     const mockResults = [
         { 'price': '118442.42', 'date': '2023-09-30 22:01:51', 'url': 'https://api.zondacrypto.exchange/rest/trading/ticker/BTC-PLN', 'stock': 'zonda', 'currency': 'PLN' },
         { 'price': '118442.42', 'date': '2023-09-30 22:01:51', 'url': 'https://api.zondacrypto.exchange/rest/trading/ticker/BTC-PLN', 'stock': 'zonda', 'currency': 'PLN' },
@@ -22,9 +27,9 @@ export default function CalculationsResults() {
         <>
             <div class="bg-slate-900">
                 <div className="form-container">
-                    <p className="form-header">Średnia wartość kryptoaktyw</p>
+                    <p className="form-header">Zestawienie kursów z różnych źródeł</p>
                     <div class="space-y-4">
-                        {mockResults.map((dataEntry, index) => (
+                        {data.map((dataEntry, index) => (
                             <CalculationsResult key={index} data={dataEntry} />
                         ))}
                     </div>
