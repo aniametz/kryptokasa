@@ -5,7 +5,7 @@ import validator from 'validator'
 export default function ManualSourcesForm() {
   const sourcesSize = 3;
   const currencies = ['PLN', 'USD'];
-  const [formValues, setFormValues] = useState(Array.from(({ length: 3 }), () => (({ url: '', stock: '', price: '', currency: currencies[0] }))));
+  const [formValues, setFormValues] = useState(Array.from(({ length: sourcesSize }), () => (({ url: '', stock: '', price: '', currency: currencies[0] }))));
   const indexes = [...Array(sourcesSize).keys()];
 
   const handleInputChange = (index, event) => {
@@ -54,30 +54,41 @@ export default function ManualSourcesForm() {
 
   return (
     <>
-      <h1>Dane do wyceny kryptoaktyw</h1>
-      <form>
-        {indexes.map((sourceIndex) => {
-          return <div key={sourceIndex}>
-            <br></br>
-            <label>Adres URL źródła</label><input type='text' name="url" value={formValues.url} onChange={(e) => handleInputChange(sourceIndex, e)} />
-            <br></br>
-            <label>Nazwa</label><input type='text' name="stock" value={formValues.stock} onChange={(e) => handleInputChange(sourceIndex, e)} />
-            <br></br>
-            <label>Kurs</label><input type='number' name="price" value={formValues.price} onChange={(e) => handleInputChange(sourceIndex, e)} />
-            <select value={formValues.currency} onChange={(e) => handleOptionChange(sourceIndex, e)}>
-              {currencies.map((currencyOption, currencyIndex) => (
-                <option key={currencyIndex} value={currencyOption}>{currencyOption}</option>
-              ))}
-            </select>
-            <br></br>
+      <div class="bg-slate-900">
+        <div className="form-container">
+          <p className="form-header">Dane do wyceny kryptoaktyw</p>
+          <form>
+            {indexes.map((sourceIndex) => {
+              return <div class="space-y-4" key={sourceIndex}>
+                <div class="form-pair">
+                  <label class="form-label">Adres URL źródła</label>
+                  <input class="form-input" type='text' name="url" value={formValues.url} onChange={(e) => handleInputChange(sourceIndex, e)} />
+                </div>
+                <div class="form-pair">
+                  <label class="form-label">Nazwa</label>
+                  <input class="form-input" type='text' name="stock" value={formValues.stock} onChange={(e) => handleInputChange(sourceIndex, e)} />
+                </div>
+                <div class="form-pair">
+                  <label class="form-label">Kurs</label>
+                  <input class="form-input mb-10" type='number' name="price" value={formValues.price} onChange={(e) => handleInputChange(sourceIndex, e)} />
+                  <select class="form-input" value={formValues.currency} onChange={(e) => handleOptionChange(sourceIndex, e)}>
+                    {currencies.map((currencyOption, currencyIndex) => (
+                      <option key={currencyIndex} value={currencyOption}>{currencyOption}</option>
+                    ))}
+                  </select>
+                </div>
+                <hr class="horizontal" />
+                <br></br>
+              </div>
+            })}
+          </form>
+          <div class="space-y-4">
+            <button class="btn-red w-full" onClick={handleComeBack}>WRÓĆ</button>
+            <button class="btn-blue" onClick={handleValidateInput}>DODAJ</button>
+            {errorMessage && <div class="error-text">{errorMessage}</div>}
           </div>
-        })}
-      </form>
-      <br></br>
-      <br></br>
-      <button onClick={handleComeBack}>WRÓĆ</button>
-      <button onClick={handleValidateInput}>DODAJ</button>
-      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+        </div>
+      </div>
     </>
   );
 }
