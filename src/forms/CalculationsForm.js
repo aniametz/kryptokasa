@@ -114,7 +114,7 @@ export default function CalculationsForm() {
     <>
       <div class="bg-slate-900">
         <div className="form-container">
-          <p className="form-header">Wycena kryptoaktyw</p>
+          <p className="form-header">Wycena kryptoaktywów</p>
           <form>
             <div class="space-y-4">
               <div class="form-pair">

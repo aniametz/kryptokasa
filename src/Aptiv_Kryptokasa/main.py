@@ -25,11 +25,7 @@ NBP_URL = f"https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json"
 @app.route('/get_price', methods=['POST'])
 def get_price():
     all_data = request.json
-    unique_symbols = list(item['selectedOption'] for item in all_data)
-    quantity = list(item['numericValue'] for item in all_data)
-
     url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
-    # url_sources = [f"https://api.zondacrypto.exchange/rest/trading/ticker/", "", ""]
     prices = [fetch_crypto_price(symbol=data['selectedOption'], quantity=data['numericValue'], source_url=url) for url in url_sources for data in all_data]
     return jsonify(prices)
 
@@ -72,13 +68,11 @@ def fetch_crypto_price(symbol, quantity, source_url, currency="PLN"):
         currency = "USD"
         url = f"{source_url}{symbol}-{currency}"
         data = fetch_url(url)
-    if currency == "USD":
-        usd_to_pln_price = fetch_usd_to_pln_price()
     timestamp = int(data["ticker"]["time"])
-    date = datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
-    price = data["ticker"]["rate"]
+    fetch_date = datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
+    price = data["ticker"]["rate"] if currency=="PLN" else fetch_usd_to_pln_price() * data["ticker"]["rate"]
     stock = stocks_enum[source_url]
-    return {'price': price, 'quantity': quantity, 'date': date, 'url': url, 'stock': stock, 'symbol': symbol, 'currency': currency}
+    return {'price': price, 'quantity': quantity, 'date': fetch_date, 'url': url, 'stock': stock, 'symbol': symbol, 'currency': currency}
 
 
 def fetch_url(url):

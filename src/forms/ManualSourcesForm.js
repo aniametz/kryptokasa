@@ -56,7 +56,7 @@ export default function ManualSourcesForm() {
     <>
       <div class="bg-slate-900">
         <div className="form-container">
-          <p className="form-header">Dane do wyceny kryptoaktyw</p>
+          <p className="form-header">Dane do wyceny kryptoaktywów</p>
           <form>
             {indexes.map((sourceIndex) => {
               return <div class="space-y-4" key={sourceIndex}>
