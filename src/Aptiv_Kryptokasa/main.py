@@ -8,6 +8,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime, date
+import time
 import requests
 from io import BytesIO
 
@@ -23,16 +24,12 @@ NBP_URL = f"https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json"
 @app.route('/get_price', methods=['POST'])
 def get_price():
     all_data = request.json
-    unique_symbols = list({item['selectedOption'] for item in all_data})
+    unique_symbols = list(item['selectedOption'] for item in all_data)
+    quantity = list(item['numericValue'] for item in all_data)
 
     url_sources = 3 * [f"https://api.zondacrypto.exchange/rest/trading/ticker/"]
     # url_sources = [f"https://api.zondacrypto.exchange/rest/trading/ticker/", "", ""]
-    prices = [fetch_crypto_price(symbol=symbol, source_url=url) for url in url_sources for symbol in unique_symbols]
-
-    # calculate average
-
-
-
+    prices = [fetch_crypto_price(symbol=data['selectedOption'], quantity=data['numericValue'], source_url=url) for url in url_sources for data in all_data]
     return jsonify(prices)
 
 @app.route('/generate_report', methods=['POST'])
@@ -43,26 +40,31 @@ def generate_report():
     for entry in all_data:
         symbol = entry["symbol"]
         price = float(entry["price"])  # Convert price to float for calculation
+        quantity = float(entry["quantity"])  # Convert price to float for calculation
 
         if symbol not in aggregated_data:
-            aggregated_data[symbol] = {"sum": 0, "count": 0}
+            aggregated_data[symbol] = {"sum": 0, "count": 0, "quantity": 0}
 
         aggregated_data[symbol]["sum"] += price
         aggregated_data[symbol]["count"] += 1
+        aggregated_data[symbol]["quantity"] += quantity
+        aggregated_data[symbol]["average"] = aggregated_data[symbol]["sum"] / aggregated_data[symbol]["count"]
 
     averages = {symbol: values["sum"] / values["count"] for symbol, values in aggregated_data.items()}
     # PDF report part
-    pdf_buffer = create_pdf(12, "4324342", 20)
-    response = Response(pdf_buffer.read(), content_type='application/pdf')
-    response.headers['Content-Disposition'] = 'inline; filename=sample.pdf'
+    report_id = int(time.time())
+    case_id= str(time.time())
+    create_pdf(report_id, case_id, aggregated_data, r"C:\repos\kryptokasa\report.pdf")
+    return jsonify(aggregated_data)
 
-def fetch_crypto_price(symbol, source_url, currency="PLN"):
+
+def fetch_crypto_price(symbol, quantity, source_url, currency="PLN"):
     url = f"{source_url}{symbol}-{currency}"
     try:
         data = fetch_url(url)
     except Exception as e:
         print("data could not be fetched")
-        return {'price': "", 'date': "", 'url': url, 'stock': "", 'symbol': symbol, 'currency': currency}
+        return {'price': "", 'quantity': "",'date': "", 'url': url, 'stock': "", 'symbol': symbol, 'currency': currency}
 
 
     if data["status"] == "Fail" and "TICKER_NOT_FOUND" in data["errors"]:
@@ -75,7 +77,7 @@ def fetch_crypto_price(symbol, source_url, currency="PLN"):
     date = datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
     price = data["ticker"]["rate"]
     stock = stocks_enum[source_url]
-    return {'price': price, 'date': date, 'url': url, 'stock': stock, 'symbol': symbol, 'currency': currency}
+    return {'price': price, 'quantity': quantity, 'date': date, 'url': url, 'stock': stock, 'symbol': symbol, 'currency': currency}
 
 
 def fetch_url(url):
@@ -89,29 +91,35 @@ def fetch_usd_to_pln_price():
     return usd_to_pln_price
 
 
-def create_pdf(raportId, numerSprawy, sredniaWartosc):
-    buffer = BytesIO()
-    # Create a PDF document
-    c = canvas.Canvas(buffer, pagesize=A4)
+def create_pdf(report_id, case_id, aggregated_data, path_to_save):
+    c = canvas.Canvas(path_to_save, pagesize=A4)
 
     # Handling polish letters
     font_name = "Verdana"
     pdfmetrics.registerFont(TTFont(font_name, 'Verdana.ttf'))
     standard_text_size = 12
 
-    # print first line data
-    c.setFont(font_name, standard_text_size)
+    # First page with case_id and report_id and document title
+    generate_first_page(c, report_id, case_id, font_name, standard_text_size)
+
+    # Generate page for each cryptocurrency
+    for crypto, data in aggregated_data.items():
+        generate_crypto_page(c, crypto, data, font_name, standard_text_size)
+
+    c.save()
+
+
+def generate_first_page(c, report_id, case_id, font_name, text_size):
+    # First line data
     line_level = 800
-    # data
     data_txt = date.today().strftime("%d.%m.%Y r.")
     c.drawString(20, line_level, data_txt)
-    # raportId
-    raportId_text = "Numer raportu: " + str(raportId)
-    raportId_width = c.stringWidth(raportId_text, font_name, standard_text_size)
+    raportId_text = "Numer raportu: " + str(report_id)
+    raportId_width = c.stringWidth(raportId_text, font_name, text_size)
     x_right_aligned = A4[0] - raportId_width - 20
     c.drawString(x_right_aligned, line_level, raportId_text)
 
-    # title
+    # Title
     title_text = "Szacowanie wartości kryptoaktywów"
     title_font_size = 24
     title_width = c.stringWidth(title_text, font_name, title_font_size)
@@ -119,20 +127,32 @@ def create_pdf(raportId, numerSprawy, sredniaWartosc):
     c.setFont(font_name, title_font_size)
     c.drawString(x_centered, 730, title_text)
 
-    c.setFont(font_name, standard_text_size)
+    c.setFont(font_name, text_size)
+    numerSprawy_text = "Numer sprawy: " + str(case_id)
+    c.drawString(80, 650, numerSprawy_text)
 
-    # numer sprawy
-    numerSprawy_text = "Numer sprawy: " + str(numerSprawy)
-    c.drawString(80, 650 , numerSprawy_text)
+    c.showPage()
 
-    # rednia wartosc s
-    sredniaWartosc_text = "Średnia wartość: " + str(sredniaWartosc)
-    c.drawString(80, 630 , sredniaWartosc_text)
 
-    c.save()
-    buffer.seek(0)
+def generate_crypto_page(c, crypto, data, font_name, text_size):
+    c.setFont(font_name, text_size)
 
-    return buffer
+    # Crypto Title
+    crypto_title = f"Aktywo: {crypto}"
+    c.drawString(80, 750, crypto_title)
+
+    # Display data
+    quantity_text = f"Ilość: {data['quantity']}"
+    average_text = f"Średnia cena: {data['average']}"
+    count_text = f"Średnia liczona z {data['count']} źródeł"
+    sum_text = f"Wartość aktywów w oparciu o średnią cenę: {data['quantity']*data['average']} PLN"
+
+    c.drawString(80, 720, quantity_text)
+    c.drawString(80, 700, average_text)
+    c.drawString(80, 680, count_text)
+    c.drawString(80, 660, sum_text)
+
+    c.showPage()
 
 # manual mode
 def validate_required_fields(json_data):
